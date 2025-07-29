@@ -93,7 +93,7 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
   };
 
   return (
-    <div className="bg-opacity-40 w-full bg-neutral-900 rounded-xl shadow-md overflow-hidden max-w-3xl flex flex-col sm:flex-row text-white">
+    <div className="w-full bg-neutral-900/95 rounded-xl overflow-hidden max-w-3xl flex flex-col sm:flex-row text-white">
       {/* Right: Content */}
       <div className="p-6 flex-1 flex flex-col justify-between gap-4">
         <h2 className="text-xl font-semibold">{title}</h2>
