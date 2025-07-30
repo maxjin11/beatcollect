@@ -60,7 +60,7 @@ export default function Carousel({ cards }: Props) {
 
     const handleTouchEnd = () => {
         const delta = touchEndX - touchStartX;
-        if (Math.abs(delta) > 25 && !isScrolling) {
+        if (Math.abs(delta) > 50 && !isScrolling) {
             isScrolling = true;
             if (delta < 0) rotate("right");
             else rotate("left");
