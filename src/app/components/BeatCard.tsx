@@ -127,7 +127,7 @@ export default function BeatCard({ title, description, slug, audio, scale = 1, i
 
   return (
     <div 
-      className="w-full h-full bg-neutral-950/96 rounded-xl shadow-lg overflow-hidden max-w-3xl flex flex-col sm:flex-row text-white"
+      className="w-full h-full bg-neutral-900/55 rounded-xl shadow-lg overflow-hidden max-w-3xl flex flex-col sm:flex-row text-white"
       style={{ transform: `scale(${scale})` }}
     >
       {/* Right: Content */}
