@@ -34,6 +34,10 @@ export default function Carousel({ cards }: Props) {
   useEffect(() => {
     let isScrolling = false;
 
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+
     const handleWheel = (e: WheelEvent) => {
       if (isScrolling) return;
       isScrolling = true;
@@ -44,13 +48,41 @@ export default function Carousel({ cards }: Props) {
       setTimeout(() => {
         isScrolling = false;
       }, 400);
+    };
 
+    const handleTouchStart = (e: TouchEvent) => {
+        touchStartX = e.touches[0].clientX;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+        touchEndX = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        const delta = touchEndX - touchStartX;
+        if (Math.abs(delta) > 25 && !isScrolling) {
+            isScrolling = true;
+            if (delta < 0) rotate("right");
+            else rotate("left");
+
+            setTimeout(() => {
+                isScrolling = false;
+            }, 400);
+        }
     };
 
     const container = containerRef.current;
     container?.addEventListener("wheel", handleWheel);
+    container?.addEventListener("touchstart", handleTouchStart);
+    container?.addEventListener("touchmove", handleTouchMove);
+    container?.addEventListener("touchend", handleTouchEnd);
 
-    return () => container?.removeEventListener("wheel", handleWheel);
+    return () => {
+        container?.removeEventListener("wheel", handleWheel);
+        container?.removeEventListener("touchstart", handleTouchStart);
+        container?.removeEventListener("touchmove", handleTouchMove);
+        container?.removeEventListener("touchend", handleTouchEnd);
+    }
   }, [cards.length]);
 
   const angleStep = 360 / cards.length;
