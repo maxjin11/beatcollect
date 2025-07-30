@@ -1,4 +1,4 @@
-declare module "vanta/src/vanta.topology" {
-  const vantaTopology: any;
-  export default vantaTopology;
+declare module "vanta/src/vanta.birds" {
+  const vantaBirds: any;
+  export default vantaBirds;
 }

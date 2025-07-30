@@ -2,6 +2,10 @@
   "compilerOptions": {
     "typeRoots": ["./types", "./node_modules/@types"],
     "jsx": "preserve",
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    }
   }
 }
 

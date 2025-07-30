@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Waveform from "./Waveform";
 import { useEffect, useRef, useState } from "react"
 import WaveSurfer from "wavesurfer.js";
 
@@ -11,9 +10,12 @@ type CardProps = {
   description: string;
   slug: string;
   audio: string;
+  scale?: number;
+  isActive?: boolean;
+  cardIndex?: number;
 };
 
-export default function BeatCard({ title, description, slug, audio } : CardProps) {
+export default function BeatCard({ title, description, slug, audio, scale = 1, isActive, cardIndex } : CardProps) {
   const waveformRef = useRef<HTMLDivElement | null>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
 
@@ -23,7 +25,15 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
   const [volume, setVolume] = useState(1); // Volume range: 0.0 - 1.0
 
   useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
     if (!waveformRef.current) return;
+
+    if(!isActive && wavesurferRef.current?.isPlaying()) {
+      wavesurferRef.current.pause();
+      setIsPlaying(false);
+    }
 
     if(wavesurferRef.current) {
       wavesurferRef.current.destroy();
@@ -32,10 +42,11 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
     const wavesurfer = WaveSurfer.create({
       container: waveformRef.current,
       waveColor: "#fff",
-      progressColor: "#aaa",
-      height: 64,
+      progressColor: "#c4b4ff",
+      height: 48,
       barWidth: 2,
       url: audio,
+      dragToSeek: true,
     });
 
     wavesurferRef.current = wavesurfer;
@@ -54,8 +65,10 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
 
     return () => {
       wavesurfer.destroy();
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [audio]);
+  }, [audio, isActive]);
 
   const togglePlay = () => {
     if (!wavesurferRef.current) return;
@@ -92,26 +105,52 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
     }
   };
 
+  const isDragging = useRef(false);
+  
+  const handleMouseDown = () => {
+    isDragging.current = true;
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging.current || !waveformRef.current) return;
+
+    const rect = waveformRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = Math.min(Math.max(x / rect.width, 0), 1); // clamp 0–1
+
+    wavesurferRef.current?.seekTo(percent);
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
   return (
-    <div className="w-full bg-neutral-900/95 rounded-xl overflow-hidden max-w-3xl flex flex-col sm:flex-row text-white">
+    <div 
+      className="w-full h-full bg-neutral-950/96 rounded-xl shadow-lg overflow-hidden max-w-3xl flex flex-col sm:flex-row text-white"
+      style={{ transform: `scale(${scale})` }}
+    >
       {/* Right: Content */}
-      <div className="p-6 flex-1 flex flex-col justify-between gap-4">
-        <h2 className="text-xl font-semibold">{title}</h2>
+      <div className="pt-[0.8vh] pl-[0.8vw] w-full h-full flex-1 flex flex-col justify-between">
+        <div className="w-1/2 h-full"> 
+          <h2 className="text-sm font-semibold">{title}</h2>
+          <p className="text-[8px] font-semibold mt-1 mb-1">{description}</p>
+        </div>
 
         <div className="flex gap-4">
           {/* Waveform */}
           <div className="flex-1">
-            <div ref={waveformRef} className="w-full rounded-md overflow-hidden" />
-            <div className="mt-2 flex items-center justify-between">
+            <div ref={waveformRef} onMouseDown={handleMouseDown} className="w-full rounded-md overflow-hidden cursor-pointer" />
+            <div className="mt-1 flex items-center justify-between">
               <button
                 onClick={togglePlay}
-                className="p-2 bg-blue-600 rounded hover:bg-blue-700"
+                className="mt-[0.5vh] mb-[0.5vh] bg-blue-600/0 flex justify-center items-center rounded size-[20px] hover:bg-violet-300 transition duration-250"
               >
                 {isPlaying ? (
                   // Pause icon
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-6 h-6 text-white"
+                    className="size-[24px] text-violet-300 hover:text-white transition duration-250"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -121,7 +160,7 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
                   // Play icon
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-6 h-6 text-white"
+                    className="size-[24px] text-violet-300 hover:text-white transition duration-250"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -129,25 +168,15 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
                   </svg>
                 )}
               </button>
-              <span className="text-sm text-gray-300">
+              <span className="text-[6px] text-gray-300">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
           </div>
 
           {/* Volume */}
-          <div className="flex flex-col items-center justify-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-gray-300"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path d="M11 5L6 9H2v6h4l5 4V5z" />
-            </svg>
-            <div className="relative h-[100px] w-[8px] flex items-center justify-center">
+          <div className="mr-[1vw] mb-[2vh] flex flex-col items-center justify-center gap-2">
+            <div className="relative h-[80px] w-[8px] flex items-center justify-center">
               <input
                 type="range"
                 min={0}
@@ -155,7 +184,16 @@ export default function BeatCard({ title, description, slug, audio } : CardProps
                 step={0.01}
                 value={volume}
                 onChange={handleVolumeChange}
-                className="w-[100px] h-[8px] rotate-[-90deg] origin-center appearance-none bg-gray-600 rounded cursor-pointer"
+                className="w-[100px] h-[6px] rotate-[-90deg] bg-neutral-600/0 origin-center appearance-none cursor-pointer [&::-webkit-slider-thumb]:opacity-0 z-20"
+              />
+
+              {/* Background track */}
+              <div className="absolute h-full w-2 bg-white pointer-events-none z-0" />
+
+              {/* Filled part */}
+              <div
+                className="absolute bottom-0 w-2 bg-violet-300 pointer-events-none z-10"
+                style={{ height: `${volume * 80}px` }}
               />
             </div>
           </div>
