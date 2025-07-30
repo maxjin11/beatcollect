@@ -20,16 +20,32 @@ const urbanist = Urbanist({
 
 const posts = [
   {
+    title: "Fallen",
+    description: "April 29th, 2025",
+    image: "",
+    slug: "fallen",
+    audio: "/beats/fallen - 140 bpm.mp3"
+  },
+
+  {
     title: "Fly",
-    description: "04-17-2025",
+    description: "April 17th, 2025",
     image: "",
     slug: "fly",
     audio: "/beats/fly - 160bpm.mp3"
   },
   
   {
+    title: "Voice",
+    description: "January 29th 2025",
+    image: "",
+    slug: "voice",
+    audio: "/beats/ambience - 135 bpm.mp3"
+  },
+
+  {
     title: "Ripple Effect",
-    description: "07-04-2024",
+    description: "July 4th, 2024",
     image: "",
     slug: "ripple",
     audio: "/beats/ripple effect - 137 bpm.mp3"
@@ -37,7 +53,7 @@ const posts = [
 
   {
     title: "Stargazing",
-    description: "06-19-2024",
+    description: "June 19th, 2024",
     image: "",
     slug: "stargazing",
     audio: "/beats/stargazing - 150 bpm.mp3"
@@ -45,10 +61,18 @@ const posts = [
 
   {
     title: "Angels",
-    description: "01-21-2022",
+    description: "January 21st, 2022",
     image: "",
     slug: "angels",
     audio: "/beats/rerock.mp3"
+  },
+
+  {
+    title: "Sandstorm",
+    description: "November 26th, 2020",
+    image: "",
+    slug: "sandstorm",
+    audio: "/beats/maxbeat103.mp3"
   },
 ];
 
